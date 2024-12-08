@@ -1,5 +1,21 @@
 ### SyriaTel Churn Modeling: Predicting Customer Retention
+
+
+
+
+
+
+
+
 <img src="sl-blog-2021-04-churnandretention-2.jpg" width="1200" height="100" />
+
+
+
+
+
+
+
+
 
 #### Business Overview
 SyriaTel is a leading mobile communications service provider headquartered in Damascus, Syria. As the top-performing mobile operator in the country, SyriaTel operates a 2G and 3G network and partners with over 200 international providers across 121 countries (Tracxn, 2024). The company offers a wide range of services, including data, voice, messaging, news, and roaming.
@@ -30,8 +46,9 @@ ROC-AUC: > 70%
 Data Understanding
 We used a customer churn dataset sourced from Kaggle for this analysis. The dataset, containing 21 columns and 3333 rows, includes a mix of categorical, numerical, and boolean data. Initial exploration of the dataset with Pandas (via .info() and .describe()) showed a balance of different data types, providing an opportunity to explore customer behaviors in detail.
 
-Data Preparation
-Data Cleaning
+### Data Preparation
+
+#### Data Cleaning
 Data cleaning is a crucial step to ensure the dataset is ready for analysis. We used the following methods to detect any issues:
 
 Null Values: The .isna() method helped identify missing values, but the dataset was free of null values.

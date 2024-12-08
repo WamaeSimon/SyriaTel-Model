@@ -70,6 +70,7 @@ def outliers(data_frame):
         col_names.append(col)
         col_count.append(outliers.value_counts().sum())
     return list(zip(col_names,col_count))
+   
 
 
 # Function to remove the outliers
@@ -213,4 +214,104 @@ def corr_matrix(data):
     plt.title('Correlation Matrix')
     plt.show()
 
+     
         
+from sklearn.linear_model import LogisticRegression
+from sklearn.metrics import classification_report, accuracy_score 
+
+# Create a function that evaluates the testing data from the train_test_split
+def Test_evaluation(data):
+   
+    # initialize a logistic regression model
+    baseline_model = LogisticRegression()
+    # fitting the model
+    baseline_model.fit(X_train, y_train)
+    
+    #make predictions on the test dataset
+    y_test_pred = baseline_model.predict(data)
+    
+    # evaluate the baseline model on the test data set
+    Accuracy = accuracy_score(y_test,y_test_pred)
+    
+    print("-------------------------Test Accuracy-----------------------------------")
+    print(Accuracy)
+    
+    print("-------------------------Testing Classification Report-----------------------------------")
+    print(classification_report(y_test,y_test_pred))
+    
+    # Compute confusion matrix
+    print("-------------------------Confusion_Matrix-----------------------------------")
+    conf_matrix = confusion_matrix(y_test, y_pred)
+    print(conf_matrix)
+    
+    
+ # Create a function that evaluate the model on the test data on ROC/AUC
+def Area_underCurve(data):
+    # create the probability scores of each of the datapoints:
+    y_score = baseline_model.fit(X_train, y_train).decision_function(X_test)
+
+    # Compute the ROC curve (FPR, TPR, thresholds)
+    fpr, tpr, thresholds = roc_curve(y_test, y_score)
+
+    # Compute AUC
+    roc_auc = auc(fpr, tpr)
+    print("-------------------------Area_underCurve-----------------------------------")
+    print(roc_auc)
+
+    # Plot ROC curve
+    plt.figure(figsize=(8, 6))
+    plt.plot(fpr, tpr, color='orange', lw=2, label=f'ROC curve (AUC = {roc_auc:.4f})')
+    # plot the diagonal line
+    plt.plot([0, 1], [0, 1], color='gray', linestyle='--')  
+    plt.xlim([0.0, 1.0])
+    plt.ylim([0.0, 1.05])
+    plt.xlabel('False Positive Rate (FPR)')
+    plt.ylabel('True Positive Rate (TPR)')
+    plt.title('Receiver Operating Characteristic (ROC) Curve')
+    plt.legend(loc='lower right')
+    plt.grid(True)
+    plt.show()
+
+    
+    
+#Hyperparameters tuning functions
+from sklearn.tree import DecisionTreeClassifier
+from sklearn.metrics import roc_curve, auc
+
+def depth_parameter(data_1,data_2):
+    
+    # Define the range of tree depths to evaluate
+    max_depths = list(range(1, 33))
+
+    # Initialize lists to store AUC scores
+    train_results = []
+    test_results = []
+
+    # Initialize a variable to store the optimal tree depth
+    best_max_depth = None
+    best_test_auc = 0
+
+    # Loop through the different depths
+    for max_depth in max_depths:
+        dt = DecisionTreeClassifier(criterion='entropy', max_depth=max_depth, random_state=42)
+        dt.fit(X_train, y_train)
+
+        # Evaluate the training set AUC
+        train_pred = dt.predict(X_train)
+        false_positive_rate, true_positive_rate, thresholds = roc_curve(y_train, train_pred)
+        train_auc = auc(false_positive_rate, true_positive_rate)
+        train_results.append(train_auc)
+
+        # Evaluate the test set AUC
+        y_pred = dt.predict(X_test)
+        false_positive_rate, true_positive_rate, thresholds = roc_curve(y_test, y_pred)
+        test_auc = auc(false_positive_rate, true_positive_rate)
+        test_results.append(test_auc)
+
+        # Track the best AUC on the test set and its corresponding max_depth
+        if test_auc > best_test_auc:
+            best_test_auc = test_auc
+            best_max_depth = max_depth
+
+    # Output the optimal tree depth based on test AUC
+    print(f"Optimal Tree Depth: {best_max_depth}")
